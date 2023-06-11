@@ -1,4 +1,4 @@
-# This script is to update the market cap of the top 10 tech stocks every 24 hours
+# This script is to initialize the DB
 
 from classes.Database import Database
 from classes.API import API
@@ -12,14 +12,13 @@ top10List = ["AAPL", "MSFT", "GOOG", "AMZN", "NVDA", "TSLA", "META", "TSM", "AVG
 
 count = 0
 for x in top10List:
-    if count == 5:
+    if count == 4:
         print("waiting for 1 minute due to API limit...")
         time.sleep(61)
         count = 0
     print(f"------ processing {x} ------")
     detail = API.get_ticker_details(x)['results']
     print(detail)
-    Database.update_ticker_data(x, detail['market_cap'])
-    count += 1
-
-
+    url = Database.upload_image_to_cloudinary(detail['branding']['icon_url'] + f"?apiKey={API.API_Key}")
+    Database.insert_ticker_data(url, detail['market_cap'], x, detail['name'])
+    count += 2
