@@ -1,5 +1,6 @@
 import requests
 import configparser
+import datetime
 
 class API:
     def __init__(self):
@@ -16,3 +17,17 @@ class API:
         endpoint = f"/v3/reference/tickers/{ticker}?apiKey={self.API_Key}"
         response = requests.get(f"{self.base_URL}{endpoint}")
         return response.json()
+
+    def get_ticker_daily_price(self, ticker):
+        today = datetime.datetime.utcnow()
+        d = datetime.timedelta(days=5)
+        a = (today - d).strftime("%Y-%m-%d")
+        endpoint = f"/v2/aggs/ticker/{ticker}/range/1/day/{a}/{datetime.datetime.utcnow().strftime('%Y-%m-%d')}?adjusted=true&sort=desc&limit=120&apiKey={self.API_Key}"
+        response = requests.get(f"{self.base_URL}{endpoint}")
+        return response.json()
+
+    def get_market_status(self):
+        endpoint = f"/v1/marketstatus/now?apiKey={self.API_Key}"
+        response = requests.get(f"{self.base_URL}{endpoint}")
+        return response.json()["indicesGroups"]["nasdaq"]
+

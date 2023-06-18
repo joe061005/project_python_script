@@ -11,15 +11,20 @@ Database = Database()
 top10List = ["AAPL", "MSFT", "GOOG", "AMZN", "NVDA", "TSLA", "META", "TSM", "AVGO", "ORCL"]
 
 count = 0
+
+index = 1 if API.get_market_status() == "closed" else 0
+
 for x in top10List:
-    if count == 5:
+    if count == 4:
         print("waiting for 1 minute due to API limit...")
         time.sleep(61)
         count = 0
     print(f"------ processing {x} ------")
-    detail = API.get_ticker_details(x)['results']
-    print(detail)
-    Database.update_ticker_data(x, detail['market_cap'])
+    capDetail = API.get_ticker_details(x)['results']
+    print(f"Market Cap: {capDetail['market_cap']}")
+    lastClosePrice = API.get_ticker_daily_price(x)['results'][index]['c']
+    print(f"Last Close Price: {lastClosePrice}")
+    Database.update_ticker_data(x, capDetail['market_cap'], lastClosePrice)
     count += 1
 
 

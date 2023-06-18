@@ -10,15 +10,15 @@ Database = Database()
 # https://companiesmarketcap.com/tech/largest-tech-companies-by-market-cap/
 top10List = ["AAPL", "MSFT", "GOOG", "AMZN", "NVDA", "TSLA", "META", "TSM", "AVGO", "ORCL"]
 
-count = 0
+index = 1 if API.get_market_status() == "closed" else 0
+
 for x in top10List:
-    if count == 4:
-        print("waiting for 1 minute due to API limit...")
-        time.sleep(61)
-        count = 0
     print(f"------ processing {x} ------")
-    detail = API.get_ticker_details(x)['results']
-    print(detail)
-    url = Database.upload_image_to_cloudinary(detail['branding']['icon_url'] + f"?apiKey={API.API_Key}")
-    Database.insert_ticker_data(url, detail['market_cap'], x, detail['name'])
-    count += 2
+    capDetail = API.get_ticker_details(x)['results']
+    print(f"Market Cap: {capDetail['market_cap']}")
+    lastClosePrice = API.get_ticker_daily_price(x)['results'][index]['c']
+    print(f"Last Close Price: {lastClosePrice}")
+    url = Database.upload_image_to_cloudinary(capDetail['branding']['icon_url'] + f"?apiKey={API.API_Key}")
+    Database.insert_ticker_data(url, capDetail['market_cap'], x, capDetail['name'], lastClosePrice)
+    print("waiting for 1 minute due to API limit...")
+    time.sleep(61)

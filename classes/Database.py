@@ -42,15 +42,15 @@ class Database:
         data = myCursor.fetchall()
         return len(data)
 
-    def insert_ticker_data(self, url, cap, ticker, name):
+    def insert_ticker_data(self, url, cap, ticker, name, lastPrice):
         myCursor = self.DB.cursor()
-        myCursor.execute("INSERT INTO stockInfo (ImageURL, MarketCap, Ticker, Name) VALUES (%s, %s, %s, %s)",
-                            (url, int(cap), ticker, name))
+        myCursor.execute("INSERT INTO stockInfo (ImageURL, MarketCap, Ticker, Name, LastPrice) VALUES (%s, %s, %s, %s, %s)",
+                            (url, int(cap), ticker, name, lastPrice))
         self.DB.commit()
 
-    def update_ticker_data(self, ticker, market_cap):
+    def update_ticker_data(self, ticker, market_cap, lastPrice):
         myCursor = self.DB.cursor()
-        myCursor.execute(f"UPDATE stockInfo SET MarketCap = {market_cap} WHERE Ticker = '{ticker}' ")
+        myCursor.execute(f"UPDATE stockInfo SET MarketCap = {market_cap}, LastPrice = {lastPrice} WHERE Ticker = '{ticker}' ")
         self.DB.commit()
 
 
