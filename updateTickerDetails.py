@@ -22,9 +22,12 @@ for x in top10List:
     print(f"------ processing {x} ------")
     capDetail = API.get_ticker_details(x)['results']
     print(f"Market Cap: {capDetail['market_cap']}")
-    lastClosePrice = API.get_ticker_daily_price(x)['results'][index]['c']
-    print(f"Last Close Price: {lastClosePrice}")
-    Database.update_ticker_data(x, capDetail['market_cap'], lastClosePrice)
+    tickerPrice = API.get_ticker_daily_price(x)['results']
+    latestClosePrice = tickerPrice[0]['c']
+    prevClosePrice = tickerPrice[1]['c']
+    volume = tickerPrice[0]['v']
+    print(f"Latest Price: {latestClosePrice}, Previous Price: {prevClosePrice}, Volume: {volume}")
+    Database.update_ticker_data(x, capDetail['market_cap'], latestClosePrice, prevClosePrice, volume)
     count += 1
 
 

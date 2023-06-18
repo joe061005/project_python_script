@@ -11,14 +11,20 @@ Database = Database()
 top10List = ["AAPL", "MSFT", "GOOG", "AMZN", "NVDA", "TSLA", "META", "TSM", "AVGO", "ORCL"]
 
 index = 1 if API.get_market_status() == "closed" else 0
+count = 0
 
 for x in top10List:
     print(f"------ processing {x} ------")
     capDetail = API.get_ticker_details(x)['results']
     print(f"Market Cap: {capDetail['market_cap']}")
-    lastClosePrice = API.get_ticker_daily_price(x)['results'][index]['c']
-    print(f"Last Close Price: {lastClosePrice}")
+    tickerPrice = API.get_ticker_daily_price(x)['results']
+    latestClosePrice = tickerPrice[0]['c']
+    prevClosePrice = tickerPrice[1]['c']
+    volume = tickerPrice[0]['v']
+    print(f"Latest Price: {latestClosePrice}, Previous Price: {prevClosePrice}, Volume: {volume}")
     url = Database.upload_image_to_cloudinary(capDetail['branding']['icon_url'] + f"?apiKey={API.API_Key}")
-    Database.insert_ticker_data(url, capDetail['market_cap'], x, capDetail['name'], lastClosePrice)
-    print("waiting for 1 minute due to API limit...")
-    time.sleep(61)
+    Database.insert_ticker_data(url, capDetail['market_cap'], x, capDetail['name'], latestClosePrice, prevClosePrice, volume)
+    count += 1
+    if count % 2 == 0:
+        print("waiting for 1 minute due to API limit...")
+        time.sleep(61)
